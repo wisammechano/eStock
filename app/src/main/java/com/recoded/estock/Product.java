@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/7/17 2:57 AM.
+ * Created by Wisam Naji on 11/14/17 7:03 AM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/7/17 2:57 AM
+ * Last modified on 11/14/17 7:03 AM
  */
 
 package com.recoded.estock;
@@ -16,6 +16,17 @@ import android.os.Parcelable;
  */
 
 public class Product implements Parcelable {
+    public static final Parcelable.Creator<Product> CREATOR = new Parcelable.Creator<Product>() {
+        @Override
+        public Product createFromParcel(Parcel source) {
+            return new Product(source);
+        }
+
+        @Override
+        public Product[] newArray(int size) {
+            return new Product[size];
+        }
+    };
     private long stockId;
     private String productName;
     private String productDesc;
@@ -44,6 +55,17 @@ public class Product implements Parcelable {
         this.imagePath = "";
     }
 
+    protected Product(Parcel in) {
+        this.stockId = in.readLong();
+        this.productName = in.readString();
+        this.productDesc = in.readString();
+        this.catName = in.readString();
+        this.price = in.readDouble();
+        this.quantity = in.readInt();
+        this.category = in.readLong();
+        this.imagePath = in.readString();
+    }
+
     public long getStockId() {
         return stockId;
     }
@@ -52,8 +74,16 @@ public class Product implements Parcelable {
         return productName;
     }
 
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
     public String getPrice() {
         return '$' + String.valueOf(price);
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public double getPriceD() {
@@ -64,13 +94,24 @@ public class Product implements Parcelable {
         return imagePath;
     }
 
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public int getQuantity() {
         return quantity;
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     public String getCatName() {
         return "In " + catName;
+    }
+
+    public void setCatName(String catName) {
+        this.catName = catName;
     }
 
     public String getQuantityString() {
@@ -81,44 +122,16 @@ public class Product implements Parcelable {
         return category;
     }
 
+    public void setCategory(long category) {
+        this.category = category;
+    }
+
     public String getProductDesc() {
         return productDesc;
     }
 
     public void setProductDesc(String productDesc) {
         this.productDesc = productDesc;
-    }
-
-    public void setCatName(String catName) {
-        this.catName = catName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setCategory(long category) {
-        this.category = category;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    public int sell(int quantity) {
-        if (quantity < this.quantity) {
-            this.quantity -= quantity;
-            return this.quantity;
-        }
-        return this.quantity;
     }
 
     public int sell() {
@@ -144,27 +157,4 @@ public class Product implements Parcelable {
         dest.writeLong(this.category);
         dest.writeString(this.imagePath);
     }
-
-    protected Product(Parcel in) {
-        this.stockId = in.readLong();
-        this.productName = in.readString();
-        this.productDesc = in.readString();
-        this.catName = in.readString();
-        this.price = in.readDouble();
-        this.quantity = in.readInt();
-        this.category = in.readLong();
-        this.imagePath = in.readString();
-    }
-
-    public static final Parcelable.Creator<Product> CREATOR = new Parcelable.Creator<Product>() {
-        @Override
-        public Product createFromParcel(Parcel source) {
-            return new Product(source);
-        }
-
-        @Override
-        public Product[] newArray(int size) {
-            return new Product[size];
-        }
-    };
 }
