@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Wisam Naji on 11/7/17 4:46 AM.
+  ~ Copyright (c) 2017. All rights reserved.
+  ~ Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
+  ~
+  ~ Last modified on 11/7/17 2:54 AM
+  -->
+
+<resources>
+    <color name="colorPrimary">#607D8B</color>
+    <color name="colorPrimaryDark">#263238</color>
+    <color name="colorAccent">#212121</color>
+    <color name="colorPrice">#b71c1c</color>
+    <color name="invalid">#30ff0000</color>
+    <color name="image_placeholder_bg">#e0e0e0</color>
+</resources>

@@ -1,0 +1,21 @@
+<!--
+  ~ Created by Wisam Naji on 11/7/17 4:25 AM.
+  ~ Copyright (c) 2017. All rights reserved.
+  ~ Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
+  ~
+  ~ Last modified on 11/7/17 2:54 AM
+  -->
+
+<resources>
+    <string name="app_name">eStock</string>
+    <string name="empty_inventory">Inventory is empty</string>
+    <string name="add_product">Add product</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="quantity">Quantity</string>
+    <string name="product_price">$ Product price</string>
+    <string name="product_description">Product description</string>
+    <string name="product_name">Product Name</string>
+    <string name="update">Update</string>
+</resources>

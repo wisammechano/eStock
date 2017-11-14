@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Wisam Naji on 11/7/17 4:35 AM.
+  ~ Copyright (c) 2017. All rights reserved.
+  ~ Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
+  ~
+  ~ Last modified on 11/7/17 4:35 AM
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="Product"
+            type="com.recoded.estock.Product"/>
+
+        <variable
+            name="showCheckbox"
+            type="Boolean"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/select_box"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:visibility="@{showCheckbox ? View.VISIBLE : View.GONE}"/>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="4dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@id/price"
+                        android:layout_toStartOf="@id/price"
+                        android:text="@{Product.productName}"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="Gauze Skater Skirt"/>
+
+                    <TextView
+                        android:id="@+id/price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:text="@{Product.price}"
+                        android:textColor="@color/colorPrice"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="$24"/>
+                </RelativeLayout>
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="@{Product.catName}"
+                    android:textSize="16sp"
+                    tools:text="In Women"/>
+
+                <TextView
+                    android:id="@+id/stock_quantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{Product.quantityString}"
+                    android:textSize="14sp"
+                    tools:text="50 items left"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/sale_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sale"
+                android:layout_gravity="bottom|right"/>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</layout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Wisam Naji on 11/13/17 6:02 PM.
+  ~ Copyright (c) 2017. All rights reserved.
+  ~ Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
+  ~
+  ~ Last modified on 11/13/17 6:02 PM
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/image_placeholder_bg"/>
+        </shape>
+    </item>
+    <item
+        android:bottom="30dp"
+        android:drawable="@drawable/ic_image_24dp"
+        android:gravity="center"
+        android:left="30dp"
+        android:right="30dp"
+        android:top="30dp"/>
+
+</layer-list>
