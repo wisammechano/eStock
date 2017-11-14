@@ -353,59 +353,6 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         }
     }
 
-/*
-    private boolean formNotChanged(boolean validate) {
-        boolean notChanged = true;
-        boolean empty = !validate; // because when we aren't validating, empty is never set to true;
-        if (binding.productName.getText().toString().equals(product.getProductName())) {
-            if (validate && product.getProductName().isEmpty()) {
-                binding.productName.setBackgroundResource(R.color.invalid);
-                empty = true;
-            }
-        } else {
-            product.setProductName(binding.productName.getText().toString());
-            notChanged = false;
-        }
-        long selectedCategory = binding.categorySelector.getSelectedItemId();
-        if (selectedCategory == product.getCategory()) {
-            if (validate && selectedCategory == -1L) {
-                binding.categorySelector.setBackgroundResource(R.color.invalid);
-                empty = true;
-            }
-        } else {
-            notChanged = false;
-        }
-
-        if (binding.productPrice.getText().toString().equals(String.valueOf(product.getPriceD()))) {
-            if (validate && product.getPriceD() == 0d) {
-                binding.productPrice.setBackgroundResource(R.color.invalid);
-                empty = true;
-            }
-        } else {
-            product.setPrice(Double.parseDouble(binding.productPrice.getText().toString()));
-            notChanged = false;
-        }
-
-        if (binding.productQuantity.getText().toString().equals(String.valueOf(product.getQuantity()))) {
-            if (validate && product.getQuantity() < 0) {
-                binding.productQuantity.setBackgroundResource(R.color.invalid);
-                empty = true;
-            }
-        } else {
-            product.setQuantity(Integer.parseInt(binding.productQuantity.getText().toString()));
-            notChanged = false;
-        }
-
-        if (!binding.productDesc.getText().toString().equals(product.getProductDesc())) {
-            product.setProductDesc(binding.productDesc.getText().toString());
-            notChanged = false;
-        }
-
-        return notChanged && empty;
-    }
-*/
-
-
     @Override
     public void onBackPressed() {
         binding.cancelButton.callOnClick();
