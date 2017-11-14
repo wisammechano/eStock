@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/12/17 3:02 PM.
+ * Created by Wisam Naji on 11/14/17 7:45 PM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/12/17 3:02 PM
+ * Last modified on 11/14/17 7:45 PM
  */
 
 package com.recoded.estock;
@@ -44,15 +44,14 @@ import static com.recoded.estock.data.ProductsHelper.TableProducts.PRODUCTS_URI;
 import static com.recoded.estock.data.ProductsHelper.TableProducts.createProductValues;
 
 public class DetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList[]> {
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     ActivityDetailsBinding binding;
     Product product = null;
     ArrayList<Long> catsIds;
     ArrayList<String> cats;
     ArrayAdapter<String> catsAdapter;
     boolean editMode;
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-
+    boolean validRequiredValue, formNotChanged, formEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +104,9 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
                     Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "supplier@gmail.com", null));
                     intent.putExtra(Intent.EXTRA_SUBJECT, "Order: More items of " + product.getProductName());
                     intent.putExtra(Intent.EXTRA_TEXT, "Hello Sir,\n\nI would like to order more items of the product in the details:\n\nProduct Name: " + product.getProductName() + "\nProduct Price: " + product.getPrice() + "\n Quantity: 100\n\nRegards.");
-                    startActivity(Intent.createChooser(intent, "Order More"));
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(Intent.createChooser(intent, "Order More"));
+                    }
                 }
             });
             binding.orderMore.setVisibility(View.VISIBLE);
@@ -121,36 +122,37 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         binding.addProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean formChanged = !formNotChanged(true);
+                checkForm(true);
                 if (editMode) {
-                    if (!formChanged) {
+                    if (formNotChanged) {
                         Toast.makeText(DetailsActivity.this, "No change to update! Cancel or change details", Toast.LENGTH_LONG).show();
                         return;
+                    } else if (validRequiredValue) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(DetailsActivity.this);
+                        dialog.setTitle("Overwrite product?");
+                        dialog.setMessage("Are you sure you want to update this entry? Current data will be lost!");
+                        dialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri = Uri.withAppendedPath(PRODUCTS_URI, "/" + product.getStockId());
+                                getContentResolver().update(uri, createProductValues(createNewProductFromForm()), null, null);
+                                DetailsActivity.this.finish();
+                            }
+                        });
+                        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        dialog.create().show();
                     }
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(DetailsActivity.this);
-                    dialog.setTitle("Overwrite product?");
-                    dialog.setMessage("Are you sure you want to update this entry? Current data will be lost!");
-                    dialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Uri uri = Uri.withAppendedPath(PRODUCTS_URI, "/" + product.getStockId());
-                            getContentResolver().update(uri, createProductValues(product), null, null);
-                            DetailsActivity.this.finish();
-                        }
-                    });
-                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.create().show();
                 } else {
-                    if (!formChanged) {
+                    if (!validRequiredValue) {
                         Toast.makeText(DetailsActivity.this, "Form is empty! Cancel or set details", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    getContentResolver().insert(PRODUCTS_URI, createProductValues(product));
+                    getContentResolver().insert(PRODUCTS_URI, createProductValues(createNewProductFromForm()));
                     DetailsActivity.this.finish();
                 }
 
@@ -161,9 +163,17 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
 
             @Override
             public void onClick(View v) {
-                if (formNotChanged(false)) {
-                    DetailsActivity.this.finish();
-                    return;
+                checkForm(false);
+                if (editMode) {
+                    if (formNotChanged) {
+                        DetailsActivity.this.finish();
+                        return;
+                    }
+                } else {
+                    if (formEmpty) {
+                        DetailsActivity.this.finish();
+                        return;
+                    }
                 }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(DetailsActivity.this);
                 dialog.setTitle("Cancel");
@@ -209,8 +219,20 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         });
     }
 
+    private Product createNewProductFromForm() {
+        Product product = new Product();
+        product.setProductName(binding.productName.getText().toString());
+        product.setProductDesc(binding.productDesc.getText().toString());
+        product.setCategory(binding.categorySelector.getSelectedItemId());
+        product.setPrice(Double.parseDouble(binding.productPrice.getText().toString()));
+        product.setQuantity(Integer.parseInt(binding.productQuantity.getText().toString()));
+        product.setImagePath(binding.productImage.getTag().toString());
+        return product;
+    }
+
     //Decrease memory usage
     private void setPic(ImageView mImageView, String imagePath) {
+        mImageView.setTag(imagePath);
         new PictureLoader(mImageView, imagePath).execute();
     }
 
@@ -258,9 +280,80 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             binding.productImage.setImageURI(Uri.parse(product.getImagePath()));
+            binding.productImage.setTag(product.getImagePath());
         }
     }
 
+    private void checkForm(boolean validate) {
+        formNotChanged = validRequiredValue = formEmpty = true;
+
+        if (binding.productName.getText().toString().isEmpty()) {
+
+            validRequiredValue = false;
+            if (validate) binding.productName.setError("Required");
+
+        } else if (editMode) {
+            if (!binding.productName.getText().toString().equals(product.getProductName())) {
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
+        if (binding.productPrice.getText().toString().isEmpty()
+                || binding.productPrice.getText().toString().equals("0.0")) {
+
+            validRequiredValue = false;
+            if (validate) binding.productPrice.setError("Required");
+
+        } else if (editMode && formNotChanged) {
+            if (!binding.productPrice.getText().toString().equals(String.valueOf(product.getPriceD()))) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+        if (binding.productQuantity.getText().toString().isEmpty()
+                || binding.productQuantity.getText().toString().equals("0")) {
+
+            validRequiredValue = false;
+            if (validate) binding.productQuantity.setError("Required");
+
+        } else if (editMode && formNotChanged) {
+            if (!binding.productQuantity.getText().toString().equals(String.valueOf(product.getQuantity()))) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+        if (binding.categorySelector.getSelectedItemId() == -1L) {
+
+            validRequiredValue = false;
+            if (validate) binding.categorySelector.setBackgroundResource(R.color.invalid);
+
+        } else if (editMode && formNotChanged) {
+            if (binding.categorySelector.getSelectedItemId() != product.getCategory()) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
+        if (editMode && formNotChanged) {
+            if (!binding.productDesc.getText().toString().equals(product.getProductDesc())) {
+                formNotChanged = false;
+            }
+
+            if (!binding.productImage.getTag().equals(product.getImagePath())) {
+                formNotChanged = false;
+            }
+        } else {
+            if (!binding.productDesc.getText().toString().isEmpty()) {
+                formEmpty = false;
+            }
+
+            if (binding.productImage.getTag() != null) {
+                formEmpty = false;
+            }
+        }
+    }
+
+/*
     private boolean formNotChanged(boolean validate) {
         boolean notChanged = true;
         boolean empty = !validate; // because when we aren't validating, empty is never set to true;
@@ -310,6 +403,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
 
         return notChanged && empty;
     }
+*/
 
 
     @Override
@@ -373,8 +467,6 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
                     });
 
                     dialog.create().show();
-                } else {
-                    product.setCategory(id);
                 }
             }
 

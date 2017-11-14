@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/7/17 2:55 AM.
+ * Created by Wisam Naji on 11/14/17 7:45 PM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/7/17 2:54 AM
+ * Last modified on 11/14/17 3:26 PM
  */
 
 package com.recoded.estock;
@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         Toast.makeText(MainActivity.this, deleteList.size() + " items deleted successfully!", Toast.LENGTH_LONG).show();
                         adapter.resetDeleteList();
                         dialog.dismiss();
+                        recreate();
+
                     }
                 });
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

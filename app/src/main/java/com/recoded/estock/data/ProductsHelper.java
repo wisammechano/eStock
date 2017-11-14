@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/7/17 3:33 AM.
+ * Created by Wisam Naji on 11/14/17 7:45 PM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/7/17 3:33 AM
+ * Last modified on 11/14/17 7:45 PM
  */
 
 package com.recoded.estock.data;
@@ -52,6 +52,8 @@ public class ProductsHelper extends SQLiteOpenHelper {
     //The contract class for products table
     public final static class TableProducts implements BaseColumns {
         public static final String TABLE, NAME, CATEGORY, PRICE, QUANTITY, DESCRIPTION, IMAGE;
+        public static final String[] ALL_FIELDS = {_ID, NAME, CATEGORY, PRICE, QUANTITY, IMAGE, DESCRIPTION};
+        public static final Uri PRODUCTS_URI = Uri.parse("content://" + AUTHORITY + '/' + TABLE);
 
         static {
             TABLE = "products";
@@ -62,9 +64,6 @@ public class ProductsHelper extends SQLiteOpenHelper {
             DESCRIPTION = "product_desc";
             IMAGE = "image_path";
         }
-
-        public static final String[] ALL_FIELDS = {_ID, NAME, CATEGORY, PRICE, QUANTITY, IMAGE, DESCRIPTION};
-        public static final Uri PRODUCTS_URI = Uri.parse("content://" + AUTHORITY + '/' + TABLE);
 
         static String getCreateSql() {
             return "CREATE TABLE " + TABLE + "(" +
@@ -78,7 +77,7 @@ public class ProductsHelper extends SQLiteOpenHelper {
         }
 
         public static ContentValues createProductValues(Product p) {
-            ContentValues values = new ContentValues(5);
+            ContentValues values = new ContentValues();
             values.put(NAME, p.getProductName());
             values.put(CATEGORY, p.getCategory());
             values.put(PRICE, p.getPriceD());
@@ -92,6 +91,7 @@ public class ProductsHelper extends SQLiteOpenHelper {
     //The contract class for categories table;
     public final static class TableCategories implements BaseColumns {
         public static final String TABLE, NAME;
+        public static final Uri CATEGORIES_URI = Uri.parse("content://" + AUTHORITY + '/' + "productCategory");
         private static final String[] CATEGORIES = {"Women", "Men", "Boys", "Girls", "Newborns"};
 
         static {
@@ -99,7 +99,6 @@ public class ProductsHelper extends SQLiteOpenHelper {
             NAME = "category_name";
         }
 
-        public static final Uri CATEGORIES_URI = Uri.parse("content://" + AUTHORITY + '/' + "productCategory");
         static String getCreateSql() {
             return "CREATE TABLE " + TABLE + "(" +
                     _ID + " INTEGER PRIMARY KEY, " +
