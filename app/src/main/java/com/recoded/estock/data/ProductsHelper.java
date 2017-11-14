@@ -52,9 +52,7 @@ public class ProductsHelper extends SQLiteOpenHelper {
     //The contract class for products table
     public final static class TableProducts implements BaseColumns {
         public static final String TABLE, NAME, CATEGORY, PRICE, QUANTITY, DESCRIPTION, IMAGE;
-        public static final String[] ALL_FIELDS = {_ID, NAME, CATEGORY, PRICE, QUANTITY, IMAGE, DESCRIPTION};
-        public static final Uri PRODUCTS_URI = Uri.parse("content://" + AUTHORITY + '/' + TABLE);
-
+       
         static {
             TABLE = "products";
             NAME = "product_name";
@@ -64,6 +62,9 @@ public class ProductsHelper extends SQLiteOpenHelper {
             DESCRIPTION = "product_desc";
             IMAGE = "image_path";
         }
+        
+        public static final String[] ALL_FIELDS = {_ID, NAME, CATEGORY, PRICE, QUANTITY, IMAGE, DESCRIPTION};
+        public static final Uri PRODUCTS_URI = Uri.parse("content://" + AUTHORITY + '/' + TABLE);
 
         static String getCreateSql() {
             return "CREATE TABLE " + TABLE + "(" +
