@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/14/17 7:45 PM.
+ * Created by Wisam Naji on 11/15/17 1:12 AM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/14/17 7:45 PM
+ * Last modified on 11/15/17 1:07 AM
  */
 
 package com.recoded.estock;
@@ -58,6 +58,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        binding.productImage.setTag(""); //Prevent NullPointerException
         if (getIntent().hasExtra("product")) {
             product = getIntent().getParcelableExtra("product");
             editMode = true;
@@ -219,6 +220,83 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         });
     }
 
+    private void checkForm(boolean validate) {
+        formNotChanged = validRequiredValue = formEmpty = true;
+
+        //Check product name != null
+        if (binding.productName.getText().toString().isEmpty()) {
+
+            validRequiredValue = false;
+            if (validate) binding.productName.setError("Required");
+
+        } else if (editMode) { //Checks whether the form has been altered
+            if (!binding.productName.getText().toString().equals(product.getProductName())) {
+                formNotChanged = false;
+            }
+        } else formEmpty = false; //empty form
+
+        //Check product price != null
+        if (binding.productPrice.getText().toString().isEmpty()
+                || binding.productPrice.getText().toString().equals("0.0")) {
+
+            validRequiredValue = false;
+            if (validate) binding.productPrice.setError("Required");
+
+        } else if (editMode && formNotChanged) {
+            if (!binding.productPrice.getText().toString().equals(String.valueOf(product.getPriceD()))) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
+        //Check product quantity != null
+        if (binding.productQuantity.getText().toString().isEmpty()
+                || binding.productQuantity.getText().toString().equals("0")) {
+
+            validRequiredValue = false;
+            if (validate) binding.productQuantity.setError("Required");
+
+        } else if (editMode && formNotChanged) {
+            if (!binding.productQuantity.getText().toString().equals(String.valueOf(product.getQuantity()))) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
+        //Check product category != null
+        if (binding.categorySelector.getSelectedItemId() == -1L) {
+
+            validRequiredValue = false;
+            if (validate) binding.categorySelector.setBackgroundResource(R.color.invalid);
+
+        } else if (editMode && formNotChanged) {
+            if (binding.categorySelector.getSelectedItemId() != product.getCategory()) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
+        //check whether form has been altered for non required details
+        if (editMode && formNotChanged) {
+            if (!binding.productDesc.getText().toString().equals(product.getProductDesc())) {
+                formNotChanged = false;
+            }
+
+            if (!binding.productImage.getTag().toString().equals(product.getImagePath())) {
+                formNotChanged = false;
+            }
+        } else {
+            if (!binding.productDesc.getText().toString().isEmpty()) {
+                formEmpty = false;
+            }
+
+            if (!binding.productImage.getTag().toString().isEmpty()) {
+                formEmpty = false;
+            }
+        }
+    }
+
+
     private Product createNewProductFromForm() {
         Product product = new Product();
         product.setProductName(binding.productName.getText().toString());
@@ -272,84 +350,14 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        product.setImagePath(image.getAbsolutePath());
+        binding.productImage.setTag(image.getAbsolutePath());
         return image;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            binding.productImage.setImageURI(Uri.parse(product.getImagePath()));
-            binding.productImage.setTag(product.getImagePath());
-        }
-    }
-
-    private void checkForm(boolean validate) {
-        formNotChanged = validRequiredValue = formEmpty = true;
-
-        if (binding.productName.getText().toString().isEmpty()) {
-
-            validRequiredValue = false;
-            if (validate) binding.productName.setError("Required");
-
-        } else if (editMode) {
-            if (!binding.productName.getText().toString().equals(product.getProductName())) {
-                formNotChanged = false;
-            }
-        } else formEmpty = false;
-
-        if (binding.productPrice.getText().toString().isEmpty()
-                || binding.productPrice.getText().toString().equals("0.0")) {
-
-            validRequiredValue = false;
-            if (validate) binding.productPrice.setError("Required");
-
-        } else if (editMode && formNotChanged) {
-            if (!binding.productPrice.getText().toString().equals(String.valueOf(product.getPriceD()))) {
-
-                formNotChanged = false;
-            }
-        } else formEmpty = false;
-        if (binding.productQuantity.getText().toString().isEmpty()
-                || binding.productQuantity.getText().toString().equals("0")) {
-
-            validRequiredValue = false;
-            if (validate) binding.productQuantity.setError("Required");
-
-        } else if (editMode && formNotChanged) {
-            if (!binding.productQuantity.getText().toString().equals(String.valueOf(product.getQuantity()))) {
-
-                formNotChanged = false;
-            }
-        } else formEmpty = false;
-        if (binding.categorySelector.getSelectedItemId() == -1L) {
-
-            validRequiredValue = false;
-            if (validate) binding.categorySelector.setBackgroundResource(R.color.invalid);
-
-        } else if (editMode && formNotChanged) {
-            if (binding.categorySelector.getSelectedItemId() != product.getCategory()) {
-
-                formNotChanged = false;
-            }
-        } else formEmpty = false;
-
-        if (editMode && formNotChanged) {
-            if (!binding.productDesc.getText().toString().equals(product.getProductDesc())) {
-                formNotChanged = false;
-            }
-
-            if (!binding.productImage.getTag().equals(product.getImagePath())) {
-                formNotChanged = false;
-            }
-        } else {
-            if (!binding.productDesc.getText().toString().isEmpty()) {
-                formEmpty = false;
-            }
-
-            if (binding.productImage.getTag() != null) {
-                formEmpty = false;
-            }
+            setPic(binding.productImage, binding.productImage.getTag().toString());
         }
     }
 
