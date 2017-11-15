@@ -1,9 +1,9 @@
 /*
- * Created by Wisam Naji on 11/15/17 1:12 AM.
+ * Created by Wisam Naji on 11/15/17 2:33 PM.
  * Copyright (c) 2017. All rights reserved.
  * Copying, redistribution or usage of material used in this file is free for educational purposes ONLY and should not be used in profitable context.
  *
- * Last modified on 11/15/17 1:07 AM
+ * Last modified on 11/15/17 2:29 PM
  */
 
 package com.recoded.estock;
@@ -52,6 +52,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     ArrayAdapter<String> catsAdapter;
     boolean editMode;
     boolean validRequiredValue, formNotChanged, formEmpty;
+    String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         binding.productImage.setTag(""); //Prevent NullPointerException
+        imagePath = "";
         if (getIntent().hasExtra("product")) {
             product = getIntent().getParcelableExtra("product");
             editMode = true;
@@ -126,7 +128,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
                 checkForm(true);
                 if (editMode) {
                     if (formNotChanged) {
-                        Toast.makeText(DetailsActivity.this, "No change to update! Cancel or change details", Toast.LENGTH_LONG).show();
+                        Toast.makeText(DetailsActivity.this, "No change to update!", Toast.LENGTH_LONG).show();
                         return;
                     } else if (validRequiredValue) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(DetailsActivity.this);
@@ -150,7 +152,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
                     }
                 } else {
                     if (!validRequiredValue) {
-                        Toast.makeText(DetailsActivity.this, "Form is empty! Cancel or set details", Toast.LENGTH_LONG).show();
+                        Toast.makeText(DetailsActivity.this, "Required fields are empty!", Toast.LENGTH_LONG).show();
                         return;
                     }
                     getContentResolver().insert(PRODUCTS_URI, createProductValues(createNewProductFromForm()));
@@ -178,7 +180,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
                 }
                 AlertDialog.Builder dialog = new AlertDialog.Builder(DetailsActivity.this);
                 dialog.setTitle("Cancel");
-                dialog.setMessage("Your input won't be saved. Sure?");
+                dialog.setMessage("Product won't be saved. Sure?");
                 dialog.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -221,6 +223,19 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void checkForm(boolean validate) {
+        /*
+        These booleans are used for validation, needless update and unwanted alert dialogs.
+        For instance, if the user came to edit a product but didn't change any thing, there is no need to update the database again with same values.
+        Also, if he pressed back or cancel, there is no need to alert him about losing his edits.
+        An extra is validation in edit mode: Like if the user edited the product and set the name to empty which is required to be filled.
+
+        Add a product mode, if the form is empty and no fields were filled and the user pressed back or cancel, it will go back without alerting.
+        However if he filled any of the fields the app will ask him for confirmation onBackPressed.
+        If he added details and there were nulls or empty values in the required fields ONLY, the app will refuse to add the product.
+
+        requird fields are: @Name, @price and @quantity and @Image.
+        optional fields: @Description.
+         */
         formNotChanged = validRequiredValue = formEmpty = true;
 
         //Check product name != null
@@ -276,23 +291,30 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
             }
         } else formEmpty = false;
 
+        //Check product image != null
+        if (binding.productImage.getTag().toString().isEmpty()) {
+
+            validRequiredValue = false;
+            if (validate) binding.productImage.setImageResource(R.drawable.image_placeholder_req);
+
+        } else if (editMode && formNotChanged) {
+            if (!binding.productImage.getTag().toString().equals(product.getImagePath())) {
+
+                formNotChanged = false;
+            }
+        } else formEmpty = false;
+
         //check whether form has been altered for non required details
         if (editMode && formNotChanged) {
             if (!binding.productDesc.getText().toString().equals(product.getProductDesc())) {
                 formNotChanged = false;
             }
 
-            if (!binding.productImage.getTag().toString().equals(product.getImagePath())) {
-                formNotChanged = false;
-            }
         } else {
             if (!binding.productDesc.getText().toString().isEmpty()) {
                 formEmpty = false;
             }
 
-            if (!binding.productImage.getTag().toString().isEmpty()) {
-                formEmpty = false;
-            }
         }
     }
 
@@ -350,14 +372,16 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        binding.productImage.setTag(image.getAbsolutePath());
+        imagePath = image.getAbsolutePath();
         return image;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            setPic(binding.productImage, binding.productImage.getTag().toString());
+            setPic(binding.productImage, imagePath);
+        } else {
+            imagePath = "";
         }
     }
 
